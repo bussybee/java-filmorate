@@ -14,7 +14,7 @@ class FilmValidatorTest {
     @Test
     void createValidFilm() throws ValidationException {
         Film film = new Film("Name", "Description",
-                LocalDate.of(2022, 12, 12 ), Duration.ofHours(2));
+                LocalDate.of(2022, 12, 12), Duration.ofHours(2));
         FilmController controller = new FilmController();
 
         Film createdFilm = controller.createFilm(film);
@@ -28,7 +28,7 @@ class FilmValidatorTest {
     @Test
     void createFilmWithoutName() {
         Film film = new Film(null, "d",
-                LocalDate.of(1980, 12, 12 ), Duration.ofHours(2));
+                LocalDate.of(1980, 12, 12), Duration.ofHours(2));
         FilmController controller = new FilmController();
 
         assertThrows(ValidationException.class, () -> controller.createFilm(film));
@@ -37,7 +37,7 @@ class FilmValidatorTest {
     @Test
     void createFilmWithNegativeDuration() {
         Film film = new Film("name", "d",
-                LocalDate.of(1980, 12, 12 ), Duration.ofHours(-2));
+                LocalDate.of(1980, 12, 12), Duration.ofHours(-2));
         FilmController controller = new FilmController();
 
         assertThrows(ValidationException.class, () -> controller.createFilm(film));
@@ -46,7 +46,7 @@ class FilmValidatorTest {
     @Test
     void updateValidFilm() throws ValidationException {
         Film film = new Film("Name", "Description",
-                LocalDate.of(2022, 12, 12 ), Duration.ofHours(2));
+                LocalDate.of(2022, 12, 12), Duration.ofHours(2));
         FilmController controller = new FilmController();
 
         controller.createFilm(film);
@@ -59,7 +59,7 @@ class FilmValidatorTest {
     @Test
     void updateFilmWithWrongReleaseDate() throws ValidationException {
         Film film = new Film("Name", "Description",
-                LocalDate.of(2022, 12, 12 ), Duration.ofHours(2));
+                LocalDate.of(2022, 12, 12), Duration.ofHours(2));
         FilmController controller = new FilmController();
 
         controller.createFilm(film);
