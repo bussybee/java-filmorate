@@ -26,6 +26,8 @@ public class User {
     public void setName(String name) {
         if (name == null || name.isBlank()) {
             this.name = this.getLogin();
+        } else {
+            this.name = name;
         }
     }
 }
