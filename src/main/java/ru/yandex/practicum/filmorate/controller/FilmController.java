@@ -20,7 +20,7 @@ public class FilmController {
         return new ArrayList<>(films.values());
     }
 
-    @PostMapping(value = "/film")
+    @PostMapping
     public Film createFilm(@RequestBody @Valid Film film) {
         film.setId(nextId);
         films.put(nextId++, film);
@@ -28,7 +28,7 @@ public class FilmController {
         return film;
     }
 
-    @PutMapping("/film")
+    @PutMapping
     public Film updateFilm(@RequestBody @Valid Film film) {
         Integer id = film.getId();
 

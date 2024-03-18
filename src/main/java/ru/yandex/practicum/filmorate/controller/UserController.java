@@ -20,7 +20,7 @@ public class UserController {
         return new ArrayList<>(users.values());
     }
 
-    @PostMapping(value = "/user")
+    @PostMapping
     public User createUser(@RequestBody @Valid User user) {
         user.setId(idGenerator++);
         user.setName(user.getName());
@@ -30,7 +30,7 @@ public class UserController {
         return user;
     }
 
-    @PutMapping("/user")
+    @PutMapping
     public User updateUser(@RequestBody @Valid User user) {
         Integer id = user.getId();
 
