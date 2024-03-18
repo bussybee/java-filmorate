@@ -5,7 +5,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import ru.yandex.practicum.filmorate.validator.PositiveDuration;
 import ru.yandex.practicum.filmorate.validator.ReleaseDate;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Data
 public class Film {
     private Integer id;
-    @NotNull(message = "Имя не должно быть пустым")
+    @NotEmpty(message = "Имя не должно быть пустым")
     private String name;
     @Size(max = 200, message = "Описание не должно превышать 200 символов")
     private String description;
