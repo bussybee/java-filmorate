@@ -26,11 +26,19 @@ public class Film {
     @PositiveDuration
     private Duration duration;
 
-    public Film(String name, String description, LocalDate releaseDate, int durationMinutes) {
+    public Film(String name, String description, LocalDate releaseDate, long durationMinutes) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = Duration.ofMinutes(durationMinutes);
+    }
+
+    public long getDuration() {
+        return duration.toMinutes();
+    }
+
+    public void setDuration(long duration) {
+        this.duration = Duration.ofMinutes(duration);
     }
 }
 

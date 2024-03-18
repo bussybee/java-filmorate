@@ -23,6 +23,7 @@ public class FilmController {
     @PostMapping
     public Film createFilm(@RequestBody @Valid Film film) {
         film.setId(nextId);
+        film.setDuration(film.getDuration());
         films.put(nextId++, film);
         log.info("Добавлен новый фильм {}", film);
         return film;
@@ -41,6 +42,7 @@ public class FilmController {
             throw new NoSuchElementException();
         }
 
+        film.setDuration(film.getDuration());
         films.put(film.getId(), film);
         log.info("Фильм с id={} обновлен", id);
         return film;
