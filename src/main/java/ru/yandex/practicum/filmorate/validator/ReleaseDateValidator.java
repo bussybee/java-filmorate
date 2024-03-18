@@ -12,6 +12,7 @@ public class ReleaseDateValidator implements ConstraintValidator<ReleaseDate, Lo
         ConstraintValidator.super.initialize(constraintAnnotation);
         movieBirthday = constraintAnnotation.value();
     }
+
     @Override
     public boolean isValid(LocalDate value, ConstraintValidatorContext context) {
         return value.isAfter(LocalDate.parse(movieBirthday));
