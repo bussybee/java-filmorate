@@ -10,9 +10,6 @@ import javax.validation.constraints.Size;
 import java.time.Duration;
 import java.time.LocalDate;
 
-/**
- * Film.
- */
 @Data
 public class Film {
     private Integer id;
@@ -21,7 +18,7 @@ public class Film {
     @Size(max = 200, message = "Описание не должно превышать 200 символов")
     private String description;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @ReleaseDate
+    @ReleaseDate(value = "1895-12-28")
     private LocalDate releaseDate;
     @PositiveDuration
     private Duration duration;
