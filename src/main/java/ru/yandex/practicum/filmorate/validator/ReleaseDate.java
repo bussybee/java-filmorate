@@ -12,6 +12,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Constraint(validatedBy = {ReleaseDateValidator.class})
 public @interface ReleaseDate {
+    String value();
     String message() default "Дата релиза должна быть позже дня рождения кино";
 
     Class<?>[] groups() default { };
