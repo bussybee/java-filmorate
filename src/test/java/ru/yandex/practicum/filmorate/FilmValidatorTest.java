@@ -4,6 +4,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.service.film.FilmServiceImp;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import javax.validation.*;
 import java.time.LocalDate;
@@ -15,6 +21,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FilmValidatorTest {
     private Validator validator;
+    FilmStorage filmStorage = new InMemoryFilmStorage();
+    UserStorage userStorage = new InMemoryUserStorage();
+    FilmService filmService = new FilmServiceImp(filmStorage, userStorage);
 
     @BeforeEach
     void setUp() {
@@ -81,7 +90,7 @@ class FilmValidatorTest {
 
     @Test
     void shouldUpdateFilm() {
-        FilmController controller = new FilmController();
+        FilmController controller = new FilmController(filmService);
         Film newFilm = new Film("name", "qedfbg",
                 LocalDate.of(2003, 3, 3), 100);
 
@@ -95,19 +104,19 @@ class FilmValidatorTest {
 
     @Test
     void shouldThrowValidationExceptionWithUnknownFilm() {
-        FilmController controller = new FilmController();
+        FilmController controller = new FilmController(filmService);
         Film newFilm = new Film("name", "qedfbg",
                 LocalDate.of(2003, 3, 3), 100);
 
         controller.createFilm(newFilm);
-        newFilm.setId(99);
+        newFilm.setId(99L);
 
         assertThrows(NoSuchElementException.class, () -> controller.updateFilm(newFilm));
     }
 
     @Test
     void shouldGetAllFilms() {
-        FilmController controller = new FilmController();
+        FilmController controller = new FilmController(filmService);
         Film film1 = new Film("name1", "qedfbg",
                 LocalDate.of(2003, 3, 3), 100);
 

@@ -9,10 +9,12 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class Film {
-    private Integer id;
+    private Long id;
     @NotEmpty(message = "Имя не должно быть пустым")
     private String name;
     @Size(max = 200, message = "Описание не должно превышать 200 символов")
@@ -22,6 +24,7 @@ public class Film {
     private LocalDate releaseDate;
     @PositiveDuration
     private Duration duration;
+    Set<Long> likes = new HashSet<>();
 
     public Film(String name, String description, LocalDate releaseDate, long durationMinutes) {
         this.name = name;
