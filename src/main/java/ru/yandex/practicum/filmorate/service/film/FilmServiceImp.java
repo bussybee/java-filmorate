@@ -3,13 +3,11 @@ package ru.yandex.practicum.filmorate.service.film;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -53,11 +51,10 @@ public class FilmServiceImp implements FilmService {
 
     @Override
     public List<Film> getPopularFilms(Integer count) {
-        if (count <= 0) {
-            throw new IncorrectParameterException("Параметр count имеет отрицательное значение.");
+        if (count == null || count <= 0) {
+            log.warn("Параметр запроса некорректен, присвоить значение по умолчанию");
+            count = 10;
         }
-
-        count = Optional.ofNullable(count).orElse(10);
 
         List<Film> allFilms = filmStorage.getAllFilms();
         allFilms.sort((film1, film2) -> film2.getLikes().size() - film1.getLikes().size());
