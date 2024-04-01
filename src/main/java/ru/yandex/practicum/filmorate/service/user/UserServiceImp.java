@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -71,20 +73,16 @@ public class UserServiceImp implements UserService {
 
     @Override
     public List<User> getCommonFriends(Long userId, Long otherId) {
-        User user = userStorage.getUser(userId);
-        User other = userStorage.getUser(otherId);
-        List<User> commonFriends = new ArrayList<>();
+        final User user = userStorage.getUser(userId);
+        final User other = userStorage.getUser(otherId);
+        final Set<Long> friends = user.getFriends();
+        final Set<Long> otherFriends = other.getFriends();
 
-        for (Long userFriend : user.getFriends()) {
-            for (Long otherFriend : other.getFriends()) {
-                if (userFriend.equals(otherFriend)) {
-                    commonFriends.add(userStorage.getUser(userFriend));
-                }
-            }
-        }
+        log.info("Вернули список общих друзей пользователей с id={},{}", userId, otherId);
 
-        log.info("Список общих друзей пользователей с id={},{}", userId, otherId);
-
-        return commonFriends;
+        return friends.stream()
+                .filter(otherFriends::contains)
+                .map(id -> userStorage.getUser(id))
+                .collect(Collectors.toList());
     }
 }
