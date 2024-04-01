@@ -24,7 +24,7 @@ public class Film {
     private LocalDate releaseDate;
     @PositiveDuration
     private Duration duration;
-    Set<Long> likes = new HashSet<>();
+    private Set<Long> likes = new HashSet<>();
 
     public Film(String name, String description, LocalDate releaseDate, long durationMinutes) {
         this.name = name;
