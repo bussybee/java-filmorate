@@ -5,10 +5,12 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class User {
-    private Integer id;
+    private Long id;
     @NotEmpty(message = "Почта не может быть пустой")
     @Email(message = "Почта должна содержать символ @")
     private String email;
@@ -19,6 +21,7 @@ public class User {
     @Past(message = "Дата рождения находится в будущем")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
+    private Set<Long> friends = new HashSet<>();
 
     public void setName(String name) {
         if (name == null || name.isBlank()) {
