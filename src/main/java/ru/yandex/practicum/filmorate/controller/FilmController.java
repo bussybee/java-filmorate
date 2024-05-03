@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
@@ -12,6 +13,7 @@ import java.util.List;
 @RequestMapping("/films")
 @AllArgsConstructor
 public class FilmController {
+    @Qualifier("db")
     private FilmService filmService;
 
     @PostMapping
@@ -27,6 +29,11 @@ public class FilmController {
     @GetMapping
     public List<Film> getAllFilms() {
         return filmService.getAllFilms();
+    }
+
+    @GetMapping("{id}")
+    public Film getFilm(@PathVariable Long id) {
+        return filmService.getFilm(id);
     }
 
     @PutMapping("{id}/like/{userId}")
