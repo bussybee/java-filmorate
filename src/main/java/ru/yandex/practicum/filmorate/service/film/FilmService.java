@@ -10,6 +10,7 @@ public interface FilmService {
     Film updateFilm(Film film);
 
     List<Film> getAllFilms();
+
     Film getFilm(Long id);
 
     void putLike(Long filmId, Long userId);
