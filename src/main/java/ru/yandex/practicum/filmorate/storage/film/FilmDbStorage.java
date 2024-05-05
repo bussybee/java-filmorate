@@ -16,6 +16,7 @@ import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @Qualifier(("db"))
@@ -32,7 +33,9 @@ public class FilmDbStorage implements FilmStorage {
                 .withTableName("films")
                 .usingGeneratedKeyColumns("id");
 
-        mpaStorage.getMpa(film.getMpa().getId());
+        Optional<MPA> mpa = Optional.ofNullable(film.getMpa());
+        mpa.ifPresent(value -> mpaStorage.getMpa(value.getId()));
+
         for (Genre genre : film.getGenres()) {
             genreStorage.getGenre(genre.getId());
         }
@@ -66,8 +69,8 @@ public class FilmDbStorage implements FilmStorage {
                 "m.id as mpa_id, m.name as mpa_name, fg.genre_id as genre_id, g.name as genre_name " +
                 "from films f " +
                 "join mpa m on m.id = f.mpa_id " +
-                "join film_genres fg on fg.film_id = f.id " +
-                "join genres g on g.id = fg.genre_id", filmRowMapper());
+                "left join film_genres fg on fg.film_id = f.id " +
+                "left join genres g on g.id = fg.genre_id", filmRowMapper());
         log.info("Получили список всех фильмов");
         return allFilms;
     }
@@ -92,16 +95,13 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getPopularFilms(Integer count) {
-        String sql = "SELECT f.id as film_id, f.name as film_name, description, release_date, duration " +
-                "FROM films f " +
-                "         JOIN ( " +
-                "    SELECT FILM_ID, COUNT(USER_ID) AS likes " +
-                "    FROM likes " +
-                "    GROUP BY FILM_ID " +
-                "    ORDER BY likes DESC, FILM_ID " +
-                "    LIMIT ? " +
-                ") AS popular_films ON f.ID = popular_films.FILM_ID;";
-        return jdbcTemplate.query(sql, filmRowMapper(), count);
+        String sql = "SELECT COUNT(USER_ID) AS QUANTITY, F.*  \n" +
+                "FROM LIKES \n" +
+                "RIGHT JOIN FILMS F ON F.ID = LIKES.FILM_ID\n" +
+                "GROUP BY F.ID \n" +
+                "ORDER BY QUANTITY DESC \n" +
+                "LIMIT ?";
+        return jdbcTemplate.query(sql, filmRowMapper2(), count);
     }
 
     private RowMapper<Film> filmRowMapper() {
@@ -112,13 +112,31 @@ public class FilmDbStorage implements FilmStorage {
             film.setDescription(rs.getString("description"));
             film.setReleaseDate(rs.getDate("release_date").toLocalDate());
             film.setDuration(rs.getLong("duration"));
-            MPA mpa = new MPA(rs.getLong("mpa_id"), rs.getString("mpa_name"));
-            film.setMpa(mpa);
+            long mpaId = rs.getLong("mpa_id");
+            if (mpaId != 0) {
+                MPA mpa = new MPA(mpaId, rs.getString("mpa_name"));
+                film.setMpa(mpa);
+            }
 
             do {
-                Genre genre = new Genre(rs.getLong("genre_id"), rs.getString("genre_name"));
-                film.getGenres().add(genre);
+                long genreId = rs.getLong("genre_id");
+                if (genreId != 0) {
+                    Genre genre = new Genre(genreId, rs.getString("genre_name"));
+                    film.getGenres().add(genre);
+                }
             } while (rs.next());
+            return film;
+        };
+    }
+
+    private RowMapper<Film> filmRowMapper2() {
+        return (rs, rowNum) -> {
+            Film film = new Film();
+            film.setId(rs.getLong("id"));
+            film.setName(rs.getString("name"));
+            film.setDescription(rs.getString("description"));
+            film.setReleaseDate(rs.getDate("release_date").toLocalDate());
+            film.setDuration(rs.getLong("duration"));
             return film;
         };
     }

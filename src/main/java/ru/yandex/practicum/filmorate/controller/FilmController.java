@@ -48,6 +48,11 @@ public class FilmController {
 
     @GetMapping("popular")
     public List<Film> getPopularFilms(@RequestParam Integer count) {
+        if (count == null) {
+            count = 10;
+        } else if (count <= 0) {
+            throw new IllegalArgumentException("Некорректно введенное количество фильмов");
+        }
         return filmService.getPopularFilms(count);
     }
 }

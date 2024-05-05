@@ -24,7 +24,7 @@ create table if not exists films (
 	duration integer,
 	release_date date,
 	description text,
-	mpa_id integer not null references mpa(id) on delete restrict
+	mpa_id integer references mpa(id) on delete restrict
 );
 
 create table if not exists genres (

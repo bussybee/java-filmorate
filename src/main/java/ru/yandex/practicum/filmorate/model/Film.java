@@ -49,13 +49,23 @@ public class Film {
         this.duration = Duration.ofMinutes(durationMinutes);
     }
 
+    public Film(Long id, String name, String description, LocalDate releaseDate,
+                long durationMinutes) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = Duration.ofMinutes(durationMinutes);
+    }
+
     public Map<String, Object> toMap() {
         Map<String, Object> values = new HashMap<>();
         values.put("name", name);
         values.put("description", description);
         values.put("release_date", releaseDate);
         values.put("duration", duration);
-        values.put("mpa_id", mpa.getId());
+        Optional<MPA> rating = Optional.ofNullable(mpa);
+        rating.ifPresent(value -> values.put("mpa_id", value.getId()));
 
         return values;
     }
