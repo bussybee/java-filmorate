@@ -31,27 +31,18 @@ public class Film {
     private List<Genre> genres = new ArrayList<>();
     private Set<Long> likes = new HashSet<>();
 
-    public Film(String name, String description, LocalDate releaseDate,
-                long durationMinutes, MPA mpa, List<Genre> genres) {
+    public Film(Long id, String name, String description, LocalDate releaseDate,
+                long durationMinutes, MPA mpa) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = Duration.ofMinutes(durationMinutes);
         this.mpa = mpa;
-        this.genres = genres;
     }
 
     public Film(String name, String description, LocalDate releaseDate,
                 long durationMinutes) {
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = Duration.ofMinutes(durationMinutes);
-    }
-
-    public Film(Long id, String name, String description, LocalDate releaseDate,
-                long durationMinutes) {
-        this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;

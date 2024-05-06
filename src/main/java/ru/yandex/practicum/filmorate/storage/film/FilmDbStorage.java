@@ -12,11 +12,8 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
-import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 
 import java.util.List;
-import java.util.Optional;
 
 @Component
 @Qualifier(("db"))
@@ -24,8 +21,6 @@ import java.util.Optional;
 @Slf4j
 public class FilmDbStorage implements FilmStorage {
     private JdbcTemplate jdbcTemplate;
-    private MpaStorage mpaStorage;
-    private GenreStorage genreStorage;
 
     @Override
     public Film createFilm(Film film) {
@@ -33,20 +28,9 @@ public class FilmDbStorage implements FilmStorage {
                 .withTableName("films")
                 .usingGeneratedKeyColumns("id");
 
-        Optional<MPA> mpa = Optional.ofNullable(film.getMpa());
-        mpa.ifPresent(value -> mpaStorage.getMpa(value.getId()));
-
-        for (Genre genre : film.getGenres()) {
-            genreStorage.getGenre(genre.getId());
-        }
-
         Long id = simpleJdbcInsert.executeAndReturnKey(film.toMap()).longValue();
         film.setId(id);
         log.info("Создали новый фильм с id = {}", id);
-
-        for (Genre genre : film.getGenres()) {
-            jdbcTemplate.update("insert into FILM_GENRES (film_id, genre_id) values (?, ?)", id, genre.getId());
-        }
 
         return film;
     }
@@ -60,6 +44,7 @@ public class FilmDbStorage implements FilmStorage {
         if (rowCount == 0) {
             throw new FilmNotFoundException(String.format("Фильм с id=%s не найден", film.getId()));
         }
+        log.info("Обновили фильм с id={}", film.getId());
         return film;
     }
 
@@ -81,9 +66,9 @@ public class FilmDbStorage implements FilmStorage {
             String sql = "select f.id as film_id, f.name as film_name, description, release_date, duration, " +
                     "m.id as mpa_id, m.name as mpa_name, fg.genre_id as genre_id, g.name as genre_name " +
                     "from films f " +
-                    "join mpa m on m.id = f.mpa_id " +
-                    "join film_genres fg on fg.film_id = f.id " +
-                    "join genres g on g.id = fg.genre_id " +
+                    "left join mpa m on m.id = f.mpa_id " +
+                    "left join film_genres fg on fg.film_id = f.id " +
+                    "left join genres g on g.id = fg.genre_id " +
                     "where f.id = ?";
             Film film = jdbcTemplate.queryForObject(sql, filmRowMapper(), id);
             log.info("Вернули фильм с id={}", id);
@@ -95,13 +80,16 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getPopularFilms(Integer count) {
-        String sql = "SELECT COUNT(USER_ID) AS QUANTITY, F.*  \n" +
-                "FROM LIKES \n" +
-                "RIGHT JOIN FILMS F ON F.ID = LIKES.FILM_ID\n" +
-                "GROUP BY F.ID \n" +
-                "ORDER BY QUANTITY DESC \n" +
+        String sql = "SELECT COUNT(USER_ID) AS QUANTITY, F.ID AS film_id, F.NAME AS film_name, F.DESCRIPTION, " +
+                "F.RELEASE_DATE, F.DURATION " +
+                "FROM LIKES " +
+                "RIGHT JOIN FILMS F ON F.ID = LIKES.FILM_ID " +
+                "GROUP BY F.ID " +
+                "ORDER BY QUANTITY DESC " +
                 "LIMIT ?";
-        return jdbcTemplate.query(sql, filmRowMapper2(), count);
+        List<Film> popularFilms = jdbcTemplate.query(sql, filmRowMapperWithoutMpa(), count);
+        log.info("Получили список популярных фильмов");
+        return popularFilms;
     }
 
     private RowMapper<Film> filmRowMapper() {
@@ -111,7 +99,12 @@ public class FilmDbStorage implements FilmStorage {
             film.setName(rs.getString("film_name"));
             film.setDescription(rs.getString("description"));
             film.setReleaseDate(rs.getDate("release_date").toLocalDate());
-            film.setDuration(rs.getLong("duration"));
+            long duration = rs.getLong("duration");
+            if (duration > 1000) { // Если продолжительность в секундах
+                film.setDuration(duration / 60);
+            } else {
+                film.setDuration(duration);
+            }
             long mpaId = rs.getLong("mpa_id");
             if (mpaId != 0) {
                 MPA mpa = new MPA(mpaId, rs.getString("mpa_name"));
@@ -129,7 +122,7 @@ public class FilmDbStorage implements FilmStorage {
         };
     }
 
-    private RowMapper<Film> filmRowMapper2() {
+    private RowMapper<Film> filmRowMapperWithoutMpa() {
         return (rs, rowNum) -> {
             Film film = new Film();
             film.setId(rs.getLong("id"));
