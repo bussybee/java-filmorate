@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.yandex.practicum.filmorate.validator.PositiveDuration;
 import ru.yandex.practicum.filmorate.validator.ReleaseDate;
@@ -9,10 +11,11 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Film {
     private Long id;
     @NotEmpty(message = "Имя не должно быть пустым")
@@ -24,13 +27,38 @@ public class Film {
     private LocalDate releaseDate;
     @PositiveDuration
     private Duration duration;
+    private MPA mpa;
+    private List<Genre> genres = new ArrayList<>();
     private Set<Long> likes = new HashSet<>();
 
-    public Film(String name, String description, LocalDate releaseDate, long durationMinutes) {
+    public Film(Long id, String name, String description, LocalDate releaseDate,
+                long durationMinutes, MPA mpa) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = Duration.ofMinutes(durationMinutes);
+        this.mpa = mpa;
+    }
+
+    public Film(String name, String description, LocalDate releaseDate,
+                long durationMinutes) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = Duration.ofMinutes(durationMinutes);
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> values = new HashMap<>();
+        values.put("name", name);
+        values.put("description", description);
+        values.put("release_date", releaseDate);
+        values.put("duration", duration);
+        Optional<MPA> rating = Optional.ofNullable(mpa);
+        rating.ifPresent(value -> values.put("mpa_id", value.getId()));
+
+        return values;
     }
 
     public long getDuration() {
