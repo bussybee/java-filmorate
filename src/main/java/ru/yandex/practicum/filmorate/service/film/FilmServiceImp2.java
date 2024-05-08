@@ -39,6 +39,7 @@ public class FilmServiceImp2 implements FilmService {
         List<Genre> genres = film.getGenres();
         List<Long> genreIds = genres.stream()
                 .map(Genre::getId)
+                .distinct()
                 .collect(Collectors.toList());
 
         List<Long> existingGenreIds = genreService.getAll().stream()
@@ -47,10 +48,10 @@ public class FilmServiceImp2 implements FilmService {
 
         if (existingGenreIds.containsAll(genreIds)) {
             jdbcTemplate.batchUpdate("INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)",
-                    genres, genres.size(),
+                    genreIds, genreIds.size(),
                     (ps, argument) -> {
                         ps.setLong(1, createdFilm.getId());
-                        ps.setLong(2, argument.getId());
+                        ps.setLong(2, argument);
                     });
         } else {
             List<Long> invalidGenreIds = genreIds.stream()
