@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 @Slf4j
-public class GenreServiceImp implements GenreService {
+public class GenreDbService implements GenreService {
     private GenreStorage genreStorage;
 
     @Override

@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Qualifier("db")
 @AllArgsConstructor
 @Slf4j
-public class FilmServiceImp2 implements FilmService {
+public class FilmDbService implements FilmService {
     @Qualifier("db")
     private FilmStorage filmStorage;
     private MpaService mpaService;

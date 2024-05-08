@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 @Slf4j
-public class MpaServiceImp implements MpaService {
+public class MpaDbService implements MpaService {
     private MpaStorage mpaStorage;
 
     @Override

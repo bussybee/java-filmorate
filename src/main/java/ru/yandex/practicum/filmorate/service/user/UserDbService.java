@@ -14,7 +14,7 @@ import java.util.List;
 @Qualifier("db")
 @Slf4j
 @AllArgsConstructor
-public class UserServiceImp2 implements UserService {
+public class UserDbService implements UserService {
     @Qualifier("db")
     private UserStorage userStorage;
     private JdbcTemplate jdbcTemplate;
